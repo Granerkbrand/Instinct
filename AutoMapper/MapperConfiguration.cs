@@ -25,17 +25,18 @@ namespace AutoMapper
         {
             Mapper result = new Mapper();
 
-            foreach(var map in _maps)
+            foreach(var (Source, Destination) in _maps)
             {
-                var sourceProperties = map.Source.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                var destinationProperties = map.Destination.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                var sourceProperties = Source.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                var destinationProperties = Destination.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-                Mapping mapping = new Mapping(map.Source, map.Destination);
+                Mapping mapping = new Mapping(Source, Destination);
 
                 foreach(var dprop in destinationProperties)
                 {
                     var connections = sourceProperties.Where(p => p.Name == dprop.Name);
-                    if(connections.Count() != 1)
+                    
+                    if(connections.Count() == 0)
                     {
                         mapping.IsValid = false;
                         continue;
@@ -43,7 +44,14 @@ namespace AutoMapper
 
                     var connection = connections.First();
 
-                    mapping.Properties.Add((connection, dprop));
+                    bool needsMapping = false;
+
+                    if(dprop.PropertyType != connection.PropertyType)
+                    {
+                        needsMapping = true;
+                    }
+
+                    mapping.Properties.Add((connection, dprop, needsMapping));
                 }
 
                 result.AddMap(mapping);

@@ -11,7 +11,7 @@ namespace AutoMapper
 
         public Type DestinationType { get; set; }
 
-        public List<(PropertyInfo Source, PropertyInfo Destination)> Properties { get; set; }
+        public List<(PropertyInfo Source, PropertyInfo Destination, bool NeedsMapping)> Properties { get; set; }
 
         public bool IsValid { get; set; }
 
@@ -20,7 +20,7 @@ namespace AutoMapper
             SourceType = sourceType;
             DestinationType = destinationType;
 
-            Properties = new List<(PropertyInfo Source, PropertyInfo Destination)>();
+            Properties = new List<(PropertyInfo Source, PropertyInfo Destination, bool NeedsMapping)>();
             IsValid = true;
         }
     }

@@ -25,25 +25,8 @@ namespace AutoMapper
             return _mappings.All(m => m.IsValid);
         }
 
-        public TDestination Map<TDestination>(object source)
-            where TDestination : class
-        {
-            // create object
-            var ctors = typeof(TDestination).GetConstructors().Where(c => c.GetParameters().Length == 0);
-            if (ctors.Count() == 0)
-                throw new Exception("There is no constructor with zero parameters");
-
-            var ctor = ctors.First();
-
-            TDestination result = (TDestination)ctor.Invoke(null);
-
-            return Map(source, result);
-        }
-
         public TDestination Map<TDestination>(object source, TDestination destination) where TDestination : class
         {
-            // find mapping
-
             Mapping mapping = null;
 
             foreach (var map in _mappings)
@@ -56,35 +39,38 @@ namespace AutoMapper
             }
 
             if (mapping == null)
-                throw new Exception($"no mapping registered for source {source.GetType()} and  {typeof(TDestination)}");
+                throw new Exception($"no mapping registered for source {source.GetType()} and  {destination.GetType()}");
 
-            foreach (var (Source, Destination) in mapping.Properties)
+            foreach (var (Source, Destination, NeedsMapping) in mapping.Properties)
             {
-                if (Source.PropertyType == Destination.PropertyType)
-                {
-                    Destination.SetValue(destination, Source.GetValue(source));
-                }
-                else
+                if (NeedsMapping)
                 {
                     Destination.SetValue(destination, Map(Source.GetValue(source), Destination.PropertyType));
+                }
+                else if (Source.PropertyType == Destination.PropertyType)
+                {
+                    Destination.SetValue(destination, Source.GetValue(source));
                 }
             }
 
             return destination;
         }
 
-        private object Map(object source, Type destinationType)
+        public TDestination Map<TDestination>(object source) where TDestination : class 
+            => Map(source, (TDestination)CreateType(typeof(TDestination)));
+
+        private object Map(object source, Type destinationType) 
+            => Map(source, CreateType(destinationType));
+
+        private object CreateType(Type type, params object[] parameters)
         {
-            // create object
-            var ctors = destinationType.GetConstructors().Where(c => c.GetParameters().Length == 0);
+            var ctors = type.GetConstructors().Where(c => c.GetParameters().Length == parameters?.Length);
             if (ctors.Count() == 0)
-                throw new Exception("There is no constructor with zero parameters");
+                throw new Exception($"There is no constructor with {parameters?.Length} parameters");
 
-            var ctor = ctors.First();
+            var ctor = ctors.Where(c => c.GetParameters().All(parameters.Contains)).First();
 
-            var result = ctor.Invoke(null);
-
-            return Map(source, Convert.ChangeType(result, destinationType));
+            return ctor.Invoke(parameters);
         }
     }
 }
