@@ -1,4 +1,4 @@
-﻿namespace AutoMapper
+﻿namespace Instinct
 {
     public interface IMapperConfiguration
     {

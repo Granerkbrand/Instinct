@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace AutoMapper
+namespace Instinct
 {
     internal sealed class Mapping
     {

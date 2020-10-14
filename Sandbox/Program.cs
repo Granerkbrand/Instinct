@@ -1,11 +1,11 @@
-﻿using AutoMapper;
+﻿using Instinct;
 using System;
 
 namespace Sandbox
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             IMapperConfiguration configuration = new MapperConfiguration();
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace AutoMapper
+namespace Instinct
 {
     public class MapperConfiguration : IMapperConfiguration
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AutoMapper
+namespace Instinct
 {
     public interface IMapper
     {
